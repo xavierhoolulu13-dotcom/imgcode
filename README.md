@@ -27,18 +27,13 @@ FROZEN CORE  →  IMGCODE  →  PUBLISHING
      └────────────── feedback ────────────────┘
 ```
 
-- **hoolulu-factory-FROZEN-CORE** — the governor. Immutable rules, contracts, the GPT808 spine. Nothing bypasses it.
+- **hoolulu-factory-FROZEN-CORE** — the governor. Immutable rules, contracts, the GPT808 spine. Nothing bypasses it. Read-only.
 - **imgcode** (this repo) — the visual planning layer. Tap bricks, arrange sequences, compile to buildable specs.
-- **publishing** — takes compiled specs to production: build, deploy, maintain, monitor.
+- **xavierhoolulu13-dotcom.github.io** (publishing) — takes compiled specs to production: build, deploy, maintain, monitor. Live at https://xavierhoolulu13-dotcom.github.io
 
-How the loop runs:
-
-1. **Govern** — every sequence is validated against the pinned Frozen Core contract before anything builds.
-2. **Plan** — IMGCODE compiles tap-arranged bricks into a system spec + build checklist + handoff pack.
-3. **Publish** — the handoff pack lands in the publishing repo; Actions build and deploy it.
-4. **Feedback** — deploy health and monitor signals loop back; the governor re-validates, IMGCODE iterates.
+See [LOOP.md](LOOP.md) for how a full cycle runs.
 
 ## Status
 
-- v0.2 "Dependency-Aware Sequence Compiler" — building
+- v0.2 "Dependency-Aware Sequence Compiler" — built, pending publish
 - Public beta: https://muse.ai/s/imgcode-xnxm6kakxufdxrt
