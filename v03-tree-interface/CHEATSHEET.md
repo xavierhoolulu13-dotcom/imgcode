@@ -43,7 +43,15 @@ cat approvals.log.jsonl
 python3 run_loop.py tree-ir/visibility-audit-tree.json business-profiles/hopohni-honolulu.json
 ```
 
-## [8] DAILY FLOW
+## [9] BROWSER DASHBOARD (works offline)
+```
+cd ~/imgcode/v03-tree-interface
+python3 dashboard.py
+```
+Then open **http://127.0.0.1:8080** in the phone browser.
+Tap a tree → RUN → read the package → APPROVE or HOLD.
+
+## [10] DAILY FLOW
 ```
 pull → run → read → approve
 ```
