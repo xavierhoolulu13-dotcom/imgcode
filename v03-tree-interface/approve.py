@@ -23,9 +23,9 @@ LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                    "approvals.log.jsonl")
 
 
-def chain_hash(prev_hash, record):
-    body = prev_hash + json.dumps(record, sort_keys=True)
-    return hashlib.sha256(body.encode()).hexdigest()
+def chain_hash(record):
+    """Hash over the full record (including prev_hash). Deterministic."""
+    return hashlib.sha256(json.dumps(record, sort_keys=True).encode()).hexdigest()
 
 
 def last_hash():
@@ -65,7 +65,7 @@ def main():
         "by": "Xavier",
     }
     record["prev_hash"] = prev
-    record["hash"] = chain_hash(prev, record)
+    record["hash"] = chain_hash(record)
 
     with open(LOG, "a") as f:
         f.write(json.dumps(record) + "\n")
