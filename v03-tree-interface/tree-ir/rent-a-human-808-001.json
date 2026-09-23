@@ -24,7 +24,10 @@
    "kind": "function",
    "label": "Instant text-back",
    "note": "Template reply in seconds, STOP opt-out honored",
-   "parent": "call-watch"
+   "parent": "call-watch",
+   "requires": [
+    "call-watch.poll"
+   ]
   },
   {
    "id": "sms-triage",
@@ -37,7 +40,10 @@
    "kind": "function",
    "label": "FAQ auto-reply",
    "note": "Price, hours, website intents from approved library",
-   "parent": "sms-triage"
+   "parent": "sms-triage",
+   "produces": [
+    "faq-reply-library"
+   ]
   },
   {
    "id": "sms-triage.escalate",
@@ -72,7 +78,10 @@
    "kind": "function",
    "label": "TCPA evidence log",
    "note": "$500-$1500 statutory damages stacked per call",
-   "parent": "spam-shield"
+   "parent": "spam-shield",
+   "produces": [
+    "call_evidence.json"
+   ]
   },
   {
    "id": "platform",
@@ -111,14 +120,19 @@
    "kind": "function",
    "label": "Missed-call + appointment agent",
    "note": "For SMBs: never miss a call, turn callers into booked appointments",
-   "parent": "offer"
+   "parent": "offer",
+   "human_approval": true,
+   "requires": [
+    "call-watch.textback"
+   ]
   },
   {
    "id": "offer.monthly",
    "kind": "function",
    "label": "Monthly care",
    "note": "Recurring revenue: keeps the text-back alive",
-   "parent": "offer"
+   "parent": "offer",
+   "human_approval": true
   },
   {
    "id": "contact-path",
@@ -132,7 +146,11 @@
    "kind": "function",
    "label": "Appointment capture",
    "parent": "offer",
-   "note": "Missed calls become booked appointments, not lost revenue"
+   "note": "Missed calls become booked appointments, not lost revenue",
+   "human_approval": true,
+   "requires": [
+    "call-watch.textback"
+   ]
   }
  ],
  "root": {
@@ -140,5 +158,7 @@
   "kind": "business",
   "label": "Rent-a-Human 808"
  },
- "tree_id": "rent-a-human-808-001"
+ "tree_id": "rent-a-human-808-001",
+ "name": "Rent-a-Human 808",
+ "purpose": "Turn missed calls into booked appointments for SMBs; shield owner and clients from spam callers with TCPA evidence"
 }
