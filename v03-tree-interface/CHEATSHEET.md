@@ -38,7 +38,12 @@ python3 approve.py sales-package.json --hold --note "waiting on pricing"
 cat approvals.log.jsonl
 ```
 
-## [7] DAILY FLOW
+## [7] REAL RUN (research needs internet; loop works offline)
+```
+python3 run_loop.py tree-ir/visibility-audit-tree.json business-profiles/hopohni-honolulu.json
+```
+
+## [8] DAILY FLOW
 ```
 pull → run → read → approve
 ```
