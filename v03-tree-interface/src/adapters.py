@@ -103,5 +103,9 @@ class GPT808Stub(GPT808Port):
 # --------------------------------------------------------------------------
 # Wiring: one line swaps a stub for the real thing.
 # --------------------------------------------------------------------------
-factory = FactoryStub()      # -> real Hoolulu Factory adapter goes here
+try:
+    from factory_adapter import FactoryAdapter
+    factory = FactoryAdapter()  # real Hoolulu Factory; fail-closed (raises NotConnectedError when unreachable)
+except Exception:
+    factory = FactoryStub()     # adapter module missing/broken -> honest stub, never fake success
 gpt808 = GPT808Stub()        # -> real GPT808 adapter goes here
