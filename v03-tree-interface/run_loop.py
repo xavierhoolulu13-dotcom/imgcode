@@ -5,7 +5,7 @@ Walks the whole monster on a sample tree so Xavier can SEE the process:
   TREE IN -> VALIDATE -> COMPOSE (scripted taps) -> COMPILE (governor)
   -> FACTORY [STUB] -> MARKET MATCH [STUB] -> SALES PACKAGE (awaits Xavier)
 
-Usage: python3 run_loop.py [tree-ir/visibility-audit-tree.json]
+Usage: python3 run_loop.py [tree] [business-profile.json]
 """
 import json
 import sys
@@ -27,6 +27,12 @@ def stage(n, total, name):
 
 def main():
     tree_path = sys.argv[1] if len(sys.argv) > 1 else "tree-ir/visibility-audit-tree.json"
+    business = SAMPLE_BUSINESS
+    real_profile = False
+    if len(sys.argv) > 2:
+        with open(sys.argv[2]) as f:
+            business = json.load(f)
+        real_profile = True
     print(BAR)
     print(" IMGCODE v0.3 — FULL LOOP TEST RUN")
     print(BAR)
@@ -82,9 +88,12 @@ def main():
     print("  build spec accepted. Real execution happens in the Hoolulu Factory.")
     print("  package: queued (demo)")
 
-    # 5. MARKET MATCH [STUB]
+    # 5. MARKET MATCH [STUB rules, real data when a profile is given]
     stage(5, 6, "MARKET MATCH — [STUB]")
-    package = match_business(composed, SAMPLE_BUSINESS)
+    package = match_business(composed, business)
+    if real_profile:
+        package["status"] = ("REAL business profile — observed data, checked "
+                             "2026-09-23; stub rules — real matching runs in GPT808 DISCOVER")
     print(f"  business: {package['business']}")
     print(f"  gaps found: {len(package['gaps_found'])}")
     for gap in package["gaps_found"]:
