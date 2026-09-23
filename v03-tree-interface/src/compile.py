@@ -6,6 +6,8 @@ release risks. Fail-closed: flags block the Factory handoff until cleared.
 import json
 from datetime import date
 
+from validate import approval_points
+
 BOOKING_WORDS = ("reserv", "booking", "order", "pay", "checkout")
 BUILD_WORDS = ("website", "build", "audit", "setup")
 MAINTAIN_WORDS = ("maintain", "monitor", "care")
@@ -72,6 +74,35 @@ def approval_gates(tree):
     ]
 
 
+def execution_order(tree):
+    """Topological levels from parent + requires links.
+
+    Canon compiler Q1-Q3: what happens first, what depends on what,
+    what can run in parallel (everything inside one level).
+    """
+    root_id = tree["root"]["id"]
+    deps = {}
+    for n in tree["nodes"]:
+        d = set()
+        if n["parent"] != root_id:
+            d.add(n["parent"])
+        for r in n.get("requires", []):
+            if r != root_id:
+                d.add(r)
+        deps[n["id"]] = d
+    levels, done, remaining = [], set(), dict(deps)
+    while remaining:
+        ready = sorted(i for i, d in remaining.items() if d <= done)
+        if not ready:  # fail closed — validator should have caught this
+            return {"levels": levels,
+                    "error": f"unorderable nodes: {sorted(remaining)}"}
+        levels.append(ready)
+        done.update(ready)
+        for i in ready:
+            del remaining[i]
+    return {"levels": levels, "error": None}
+
+
 def check_risks(tree):
     risks = []
     count = len(tree["nodes"])
@@ -100,8 +131,9 @@ def compile_tree(tree):
     order_flags = check_ordering(tree)
     risks = check_risks(tree)
     blocking = dep_flags + order_flags
+    spec_id = f"{tree['tree_id']}-spec"
     spec = {
-        "spec_id": f"{tree['tree_id']}-spec",
+        "spec_id": spec_id,
         "ir_version": "0.3",
         "compiled": str(date.today()),
         "node_count": len(tree["nodes"]),
@@ -111,11 +143,19 @@ def compile_tree(tree):
             "risks": risks,
             "blocking_flags": len(blocking),
             "verdict": "GO" if not blocking else "BLOCKED — clear flags first",
+            "approval_points": approval_points(tree),
+            "execution_order": execution_order(tree),
         },
         "approval_gates": approval_gates(tree),
         "factory_handoff": {
-            "status": "ready" if not blocking else "held",
-            "note": "Hand the composed tree + this spec to the Hoolulu Factory.",
+            # Canon §28 adapter contract: identify SOURCE/TARGET/INPUT/OUTPUT/STATUS/ERROR.
+            # Never fake execution.
+            "source": "IMGCODE compiler",
+            "target": "Hoolulu Factory",
+            "input": spec_id,
+            "output": "RESULT (build / delivery)",
+            "status": "NOT_CONNECTED — adapter stub; execution not faked",
+            "error": None,
         },
     }
     return spec
@@ -140,6 +180,20 @@ def handoff_markdown(tree, spec):
     lines += ["", "## Approval gates"]
     for gate in spec["approval_gates"]:
         lines.append(f"- [ ] {gate}")
+    lines += ["", "## Approval points (canon §5)"]
+    for a in g.get("approval_points", []):
+        lines.append(f"- [ ] {a}")
+    eo = g.get("execution_order", {})
+    if eo.get("error"):
+        lines += ["", f"## ORDER ERROR: {eo['error']}"]
+    else:
+        lines += ["", "## Execution order (each level runs in parallel)"]
+        for i, lvl in enumerate(eo.get("levels", []), 1):
+            lines.append(f"- L{i}: {', '.join(lvl)}")
+    fh = spec.get("factory_handoff", {})
+    lines += ["", "## Factory handoff (canon §28 adapter)"]
+    for k in ("source", "target", "input", "output", "status", "error"):
+        lines.append(f"- {k}: {fh.get(k)}")
     return "\n".join(lines) + "\n"
 
 
