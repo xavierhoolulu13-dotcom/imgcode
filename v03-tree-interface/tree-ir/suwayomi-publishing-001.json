@@ -1,0 +1,121 @@
+{
+ "ir_version": "0.3",
+ "meta": {
+  "created": "2026-09-23",
+  "niche": "publishing-platform",
+  "source": "hand-built"
+ },
+ "nodes": [
+  {
+   "id": "get",
+   "kind": "system",
+   "label": "GET \u2014 ingest",
+   "note": "Content and compiled systems flow in: client libraries, docs, comics, channel builds",
+   "parent": "root"
+  },
+  {
+   "id": "get.sources",
+   "kind": "function",
+   "label": "Source intake",
+   "note": "Extensions + local sources + uploads; client-owned and public-domain lanes only",
+   "parent": "get"
+  },
+  {
+   "id": "sort",
+   "kind": "system",
+   "label": "SORT \u2014 library",
+   "note": "Everything cataloged, tagged, searchable",
+   "parent": "root"
+  },
+  {
+   "id": "sort.catalog",
+   "kind": "function",
+   "label": "Catalog + metadata",
+   "note": "Library organization, categories, reading progress",
+   "parent": "sort"
+  },
+  {
+   "id": "create",
+   "kind": "system",
+   "label": "CREATE \u2014 build",
+   "note": "Factory turns trees into deployable bundles",
+   "parent": "root"
+  },
+  {
+   "id": "create.bundle",
+   "kind": "function",
+   "label": "Deploy bundle",
+   "note": "Docker Compose + branded config + backup runbook; built by Factory, described by IMGCODE tree",
+   "parent": "create"
+  },
+  {
+   "id": "offer",
+   "kind": "offer",
+   "label": "SELL \u2014 offer",
+   "note": "The platform carries the offer to clients",
+   "parent": "root"
+  },
+  {
+   "id": "offer.setup",
+   "kind": "offer",
+   "label": "Publishing setup",
+   "note": "Your own private library/publishing server, hosted for you",
+   "parent": "offer"
+  },
+  {
+   "id": "offer.monthly",
+   "kind": "offer",
+   "label": "Monthly care",
+   "note": "Hosting + updates + backups, recurring",
+   "parent": "offer"
+  },
+  {
+   "id": "maintain",
+   "kind": "system",
+   "label": "MAINTAIN \u2014 health",
+   "note": "Keep every deployed instance alive and fresh",
+   "parent": "root"
+  },
+  {
+   "id": "maintain.watch",
+   "kind": "function",
+   "label": "Health watch",
+   "note": "GraphQL status + library stats feed the MONITOR/RETAIN loop",
+   "parent": "maintain"
+  },
+  {
+   "id": "serve",
+   "kind": "system",
+   "label": "Serve layer",
+   "note": "Web UI + GraphQL API + OPDS feed; Kotlin server, Docker-ready",
+   "parent": "root"
+  },
+  {
+   "id": "factory-link",
+   "kind": "system",
+   "label": "Factory link",
+   "note": "Adapter: Factory builds the deploy bundles. Stub today, real interface pending.",
+   "parent": "root"
+  },
+  {
+   "id": "imgcode-link",
+   "kind": "system",
+   "label": "IMGCODE link",
+   "note": "This tree is the contract: any tree source can describe a publishable system",
+   "parent": "root"
+  },
+  {
+   "id": "contact",
+   "kind": "function",
+   "label": "Contact path",
+   "note": "xavierhoolulu13@gmail.com \u00b7 Cash App $xksh808dsh",
+   "parent": "root"
+  }
+ ],
+ "root": {
+  "id": "root",
+  "label": "Suwayomi Publishing Platform",
+  "kind": "business"
+ },
+ "tree_id": "suwayomi-publishing-001"
+}
