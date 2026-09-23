@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMGCODE v0.3 — Cockpit</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; background: #0d1117; color: #e6edf3;
+         margin: 0; padding: 16px; max-width: 640px; margin-inline: auto; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  .sub { color: #8b949e; font-size: .85rem; margin-bottom: 16px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+          padding: 14px; margin-bottom: 12px; }
+  .card h2 { font-size: 1rem; margin: 0 0 10px; color: #79c0ff; }
+  .tree { display: block; width: 100%; text-align: left; background: #21262d;
+          border: 2px solid transparent; color: #e6edf3; border-radius: 10px;
+          padding: 12px; margin-bottom: 8px; font-size: 1rem; cursor: pointer; }
+  .tree small { color: #8b949e; display: block; margin-top: 2px; }
+  .tree.sel { border-color: #1f6feb; background: #0d2137; }
+  .btn { display: block; width: 100%; border: none; border-radius: 10px;
+         padding: 16px; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+         margin-bottom: 8px; color: #fff; }
+  .btn.run { background: #1f6feb; }
+  .btn.approve { background: #238636; }
+  .btn.hold { background: #da3633; }
+  .btn:active { opacity: .8; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { margin-bottom: 0; }
+  input[type=text] { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363d;
+                     background: #0d1117; color: #e6edf3; font-size: 1rem; margin-bottom: 8px; }
+  .out { background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+         padding: 10px; font-size: .85rem; white-space: pre-wrap; max-height: 300px; overflow: auto; }
+  .go { color: #3fb950; font-weight: 700; }
+  .blocked { color: #da3633; font-weight: 700; }
+  .logline { font-size: .8rem; padding: 6px 0; border-bottom: 1px solid #21262d; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; }
+  .pill.a { background: #238636; } .pill.h { background: #da3633; }
+  .kv { font-size: .9rem; margin: 4px 0; } .kv b { color: #79c0ff; }
+</style>
+</head>
+<body>
+  <h1>IMGCODE v0.3 — Cockpit</h1>
+  <div class="sub">Offline control room. Nothing leaves this phone.</div>
+
+  <div class="card">
+    <h2>1 · Pick a tree</h2>
+    <div id="trees"><div class="sub">loading…</div></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Run the loop</h2>
+    <button class="btn run" onclick="runLoop()">▶ RUN THE LOOP</button>
+    <div id="runout" class="out" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Sales package</h2>
+    <div id="pkg"><div class="sub">run the loop first</div></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · Your call — approve or hold</h2>
+    <input type="text" id="note" placeholder="note (optional), e.g. waiting on pricing">
+    <div class="row">
+      <button class="btn approve" onclick="decide('APPROVE')">✓ APPROVE</button>
+      <button class="btn hold" onclick="decide('HOLD')">✕ HOLD</button>
+    </div>
+    <div id="decout" class="sub" style="margin:8px 0 0"></div>
+  </div>
+
+  <div class="card">
+    <h2>Decision log</h2>
+    <div id="log"><div class="sub">loading…</div></div>
+  </div>
+
+<script>
+let selTree = null;
+async function api(p, opts) { const r = await fetch(p, opts); return r.json(); }
+
+async function loadTrees() {
+  const trees = await api('/api/trees');
+  const el = document.getElementById('trees');
+  el.innerHTML = '';
+  trees.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'tree' + (selTree === t.file ? ' sel' : '');
+    b.innerHTML = `${t.label || t.tree_id}<small>${t.tree_id} · ${t.nodes} nodes</small>`;
+    b.onclick = () => { selTree = t.file; loadTrees(); };
+    el.appendChild(b);
+  });
+  if (!selTree && trees.length) { selTree = trees[0].file; loadTrees(); }
+}
+
+async function runLoop() {
+  const out = document.getElementById('runout');
+  out.style.display = 'block'; out.textContent = 'running…';
+  const r = await api('/api/run', { method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tree: selTree }) });
+  const verdict = (r.verdict || '').includes('GO')
+    ? '<span class="go">GO</span>' : '<span class="blocked">NOT GO</span>';
+  out.innerHTML = `${r.valid || ''}\nverdict: ${verdict}`;
+  loadPackage();
+}
+
+async function loadPackage() {
+  const p = await api('/api/package');
+  const el = document.getElementById('pkg');
+  if (!p.business) { el.innerHTML = '<div class="sub">run the loop first</div>'; return; }
+  el.innerHTML =
+    `<div class="kv"><b>business:</b> ${p.business}</div>` +
+    `<div class="kv"><b>gaps:</b> ${(p.gaps_found || []).join('; ') || 'none'}</div>` +
+    `<div class="kv"><b>offer:</b> ${(p.proposed_offer || []).join('; ')}</div>` +
+    `<div class="kv"><b>status:</b> ${p.status || ''}</div>`;
+}
+
+async function decide(d) {
+  const note = document.getElementById('note').value;
+  const r = await api('/api/decision', { method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ decision: d, note }) });
+  document.getElementById('decout').textContent =
+    r.ok ? `${r.decision} recorded.` : 'failed — try again';
+  document.getElementById('note').value = '';
+  loadLog();
+}
+
+async function loadLog() {
+  const lines = await api('/api/log');
+  const el = document.getElementById('log');
+  if (!lines.length) { el.innerHTML = '<div class="sub">no decisions yet</div>'; return; }
+  el.innerHTML = lines.slice().reverse().map(l =>
+    `<div class="logline"><span class="pill ${l.decision[0]==='A'?'a':'h'}">${l.decision}</span>
+     ${l.business || ''} · ${l.ts || ''}${l.note ? ' · “' + l.note + '”' : ''}</div>`
+  ).join('');
+}
+
+loadTrees(); loadPackage(); loadLog();
+</script>
+</body>
+</html>
