@@ -73,6 +73,16 @@ def main():
     for r in g["risks"]:
         print("  RISK:", r)
     print(f"  verdict: {g['verdict']}")
+    print(f"  approval points ({len(g['approval_points'])}):")
+    for a in g["approval_points"]:
+        print("   -", a)
+    eo = g["execution_order"]
+    if eo["error"]:
+        print("  ORDER ERROR:", eo["error"])
+    else:
+        print(f"  execution levels: {len(eo['levels'])} (each level can run in parallel)")
+        for i, lvl in enumerate(eo["levels"], 1):
+            print(f"   L{i}: {', '.join(lvl)}")
     if g["blocking_flags"]:
         print("  loop HELD — clear flags, then re-run. (This is the governor doing its job.)")
         sys.exit(2)
