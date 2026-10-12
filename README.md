@@ -33,6 +33,15 @@ FROZEN CORE  →  IMGCODE  →  PUBLISHING
 
 See [LOOP.md](LOOP.md) for how a full cycle runs.
 
+## Ecosystem
+
+IMGCODE is the visual planning layer of a four-project ecosystem:
+
+- **x-it** — https://github.com/xavierhoolulu13-dotcom/x-it — Xavier's own AI product and the brain/OS of the system (chat, sandbox execution, tool calling, local Ollama support).
+- **TENTCITY** — https://github.com/xavierhoolulu13-dotcom/tentcity (live: https://xavierhoolulu13-dotcom.github.io/tentcity/) — the public mall front door: $5 entry, tool directory, lead funnels.
+- **IMGCODE** — https://github.com/xavierhoolulu13-dotcom/imgcode — "code you tap, not type": visual tap-to-build system that compiles tapped specs into shippable systems.
+- **Hoolulu Factory** — https://github.com/xavierhoolulu13-dotcom/hoolulu-factory — the backend engine: agents, autopilot loops, client ops.
+
 ## Status
 
 - v0.2 "Dependency-Aware Sequence Compiler" — built, pending publish
